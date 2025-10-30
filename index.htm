@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>My First Map With Markers</title>
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.css" rel="stylesheet">
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    img {
+      width: 200px;
+    }
+
+    #map {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map"></div>
+  <script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiZG9tbGV0IiwiYSI6ImNtZzVyeG1hYTA3cXEyaXE0Ymp6MHBsNDIifQ.PBPONoWC4rGjYQCPHtF-bw';
+    const map = new mapboxgl.Map({
+      container: 'map',
+      /*
+      Choose from Mapbox's core styles, or make your own style with Mapbox Studio
+      Mapbox Outdoors: mapbox://styles/mapbox/outdoors-v12
+      Mapbox Light: mapbox://styles/mapbox/light-v11
+      Mapbox Dark: mapbox://styles/mapbox/dark-v11
+      Mapbox Satellite: mapbox://styles/mapbox/satellite-v9
+      Mapbox Satellite Streets: mapbox://styles/mapbox/satellite-streets-v12
+      Mapbox Streets: mapbox://styles/mapbox/streets-v12
+      */
+      style: 'mapbox://styles/mapbox/outdoors-v12',
+      center: [-121.403732, 40.492392],
+      zoom: 5
+    
+    });
+
+    map.on('load', () => {
+      map.addSource('my-places', {
+        'type': 'geojson',
+        'data': {
+          'type': 'FeatureCollection',
+          'features': [
+            {
+              'type': 'Feature',
+              'geometry': {
+                'type': 'Point',
+                'coordinates': [-122.08774103681603, 37.61055784332607, ] 
+              },
+              "properties": {
+                'name': "my first pop up is at a soccer field" ,
+                'description': "I usually go play soccer here during the week",
+                 'image':"IMG/AldenEOliverSportsPark.png",
+              }
+            },
+            {
+              'type': 'Feature',
+              'geometry': {
+                'type': 'Point',
+                'coordinates': [-122.23328816054196, 37.8819722062407, ]
+              },
+              "properties": {
+                'name': "my 2nd popup is at berekly in the hills",
+                'description': "I went here last weekend with a couple of my friends to chill",
+                'image':"IMG/grizzly.png", 
+              }
+            },
+            {
+              'type': 'Feature',
+              'geometry': {
+                'type': 'Point',
+                'coordinates': [-101.18099090840701, 19.705100981846563]
+              },
+          
+              "properties": {
+                'name': "my 3rd popup is in morelia,mexico ",
+                'description': "I went to the center with my family and really liked this fuente",
+                'image':"IMG/download.png",  
+              }
+              
+            }
+          ]
+        }
+      });
+      map.addLayer({
+        'id': 'my-places',
+        'type': 'circle',
+        'source': 'my-places',
+        'paint': {
+          'circle-radius': 6,
+          'circle-color': '#B42222'
+        },
+        'filter': ['==', '$type', 'Point']
+      });
+
+      // add popup on click
+      map.addInteraction('my 3rd popup is in morelia,mexico', {
+        type: 'click',
+        target: { layerId: 'my-places' },
+        handler: (e) => {
+          const coordinates = e.feature.geometry.coordinates.slice();
+          const name = e.feature.properties.name;
+          const description = e.feature.properties.description;
+          const image = e.feature.properties.image;
+
+          new mapboxgl.Popup()
+            .setLngLat(coordinates)
+            .setHTML("<img src='" + image + "'><br><strong>" + name + "</strong><br/>" + description)
+            .addTo(map);
+        }
+      });
+    });
+
+  </script>
+
+</body>
+
+</html>
